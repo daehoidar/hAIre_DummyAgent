@@ -1,0 +1,131 @@
+{
+  "info": {
+    "slug": "blind-resume-scanner",
+    "name": "블라인드 레쥬메 스캐너",
+    "version": "1.0.0",
+    "description": "채용 공고(JD)와 지원자 이력서를 입력하면, 편향을 제거한 블라인드 요약본과 역량 매칭 점수를 생성합니다.",
+    "price": 1500,
+    "icon": "users",
+    "category": "인사(HR)",
+    "tags": ["채용", "이력서", "블라인드", "역량 매칭", "HR", "면접"]
+  },
+
+  "run": {
+    "engine": "python-3.11",
+    "entry_point": "src.main:run",
+    "dependencies": "requirements.txt"
+  },
+
+  "resources": {
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-4o",
+      "parameters": {
+        "temperature": 0.1,
+        "max_tokens": 8192
+      }
+    },
+    "tools": [
+      {
+        "name": "pdf_parser",
+        "description": "이력서 PDF/DOCX 파싱 및 구조화",
+        "library": "pdfplumber + python-docx"
+      },
+      {
+        "name": "bias_detector",
+        "description": "편향 유발 정보 탐지 및 제거 (이름, 성별, 나이, 학교명, 사진)",
+        "library": "자체 NER + 규칙 기반 필터"
+      }
+    ],
+    "auth": []
+  },
+
+  "inputs": [
+    {
+      "name": "job_description",
+      "type": "text_area",
+      "label": "채용 공고 (JD)",
+      "placeholder": "채용 공고 전문을 붙여넣으세요.\n직무 내용, 자격 요건, 우대 사항이 포함되어 있으면 매칭 정확도가 높아집니다.",
+      "required": true
+    },
+    {
+      "name": "resumes",
+      "type": "file_upload",
+      "label": "지원자 이력서",
+      "accept": [".pdf", ".docx"],
+      "max_files": 100,
+      "max_size_mb": 10,
+      "required": true
+    },
+    {
+      "name": "blind_fields",
+      "type": "checkbox_group",
+      "label": "블라인드 처리할 항목",
+      "options": [
+        {"value": "name", "label": "이름"},
+        {"value": "gender", "label": "성별"},
+        {"value": "age", "label": "나이/생년월일"},
+        {"value": "school", "label": "출신 학교명"},
+        {"value": "photo", "label": "사진"},
+        {"value": "address", "label": "거주 지역"}
+      ],
+      "default": ["name", "gender", "age", "school", "photo"],
+      "required": true
+    },
+    {
+      "name": "scoring_weights",
+      "type": "radio",
+      "label": "점수 가중치 기준",
+      "options": [
+        {"value": "balanced", "label": "균등 배분 (경력:기술:프로젝트:자격증 = 25:25:25:25)"},
+        {"value": "experience_heavy", "label": "경력 중심 (경력:기술:프로젝트:자격증 = 40:25:20:15)"},
+        {"value": "skill_heavy", "label": "기술 중심 (경력:기술:프로젝트:자격증 = 20:40:25:15)"},
+        {"value": "custom", "label": "직접 설정"}
+      ],
+      "default": "balanced",
+      "required": true
+    },
+    {
+      "name": "top_n",
+      "type": "radio",
+      "label": "상위 후보 수",
+      "options": [
+        {"value": "3", "label": "Top 3"},
+        {"value": "5", "label": "Top 5"},
+        {"value": "10", "label": "Top 10"},
+        {"value": "all", "label": "전체 순위"}
+      ],
+      "default": "5",
+      "required": true
+    }
+  ],
+
+  "outputs": {
+    "view_type": "recruitment_dashboard",
+    "items": [
+      {
+        "name": "ranking_table",
+        "type": "table",
+        "label": "지원자 종합 순위",
+        "columns": ["순위", "지원자 ID", "종합 점수", "경력 점수", "기술 점수", "프로젝트 점수", "자격증 점수", "강점 요약"]
+      },
+      {
+        "name": "blind_summaries",
+        "type": "document_array",
+        "label": "블라인드 요약본",
+        "description": "지원자별 1페이지 분량의 블라인드 이력 요약"
+      },
+      {
+        "name": "interview_questions",
+        "type": "table",
+        "label": "맞춤 면접 질문",
+        "columns": ["지원자 ID", "질문", "질문 의도", "확인 포인트"]
+      },
+      {
+        "name": "download_bundle",
+        "type": "file_bundle",
+        "label": "전체 결과 다운로드 (엑셀 + 블라인드 요약본 PDF)"
+      }
+    ]
+  }
+}

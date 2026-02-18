@@ -1,0 +1,137 @@
+{
+  "info": {
+    "slug": "smart-sourcer",
+    "name": "스마트 소서",
+    "version": "1.0.0",
+    "description": "구매 조건을 입력하면 제품 스펙을 비교 분석하고, 최저가 정보와 비교표를 자동 생성합니다.",
+    "price": 500,
+    "icon": "search",
+    "category": "쇼핑/비교분석",
+    "tags": ["제품 비교", "최저가", "구매 가이드", "리서치", "비교표"]
+  },
+
+  "run": {
+    "engine": "python-3.11",
+    "entry_point": "src.main:run",
+    "dependencies": "requirements.txt"
+  },
+
+  "resources": {
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-4o",
+      "parameters": {
+        "temperature": 0.2,
+        "max_tokens": 4096
+      }
+    },
+    "tools": [
+      {
+        "name": "web_scraper",
+        "description": "제조사 공식 스펙 페이지 및 전문 리뷰 사이트 크롤링",
+        "library": "Playwright + BeautifulSoup"
+      },
+      {
+        "name": "price_tracker",
+        "description": "주요 쇼핑몰 최저가 조회",
+        "library": "Naver Shopping API + 자체 크롤러"
+      },
+      {
+        "name": "report_generator",
+        "description": "비교표 및 PDF 리포트 생성",
+        "library": "openpyxl + reportlab"
+      }
+    ],
+    "auth": []
+  },
+
+  "inputs": [
+    {
+      "name": "search_query",
+      "type": "text_area",
+      "label": "찾고 있는 제품/서비스",
+      "placeholder": "평소 말하듯 편하게 적어주세요.\n\n예: 디자이너가 쓸 27인치 4K 모니터 추천해줘. 예산은 80만원이고, 맥북이랑 연결할 거라 USB-C 충전 꼭 돼야 해.\n\n예: 30평 아파트 거실에 둘 공기청정기. LG랑 삼성 중에서 필터 교체 편하고 조용한 모델로 비교해줘.",
+      "required": true
+    },
+    {
+      "name": "budget",
+      "type": "text",
+      "label": "예산 (선택)",
+      "placeholder": "예: 80만원, 50~100만원, 제한 없음",
+      "required": false
+    },
+    {
+      "name": "compare_count",
+      "type": "radio",
+      "label": "비교 제품 수",
+      "options": [
+        {"value": "3", "label": "3개 (빠른 비교)"},
+        {"value": "5", "label": "5개 (폭넓은 비교)"},
+        {"value": "auto", "label": "자동 (조건에 맞는 최적 수)"}
+      ],
+      "default": "3",
+      "required": true
+    },
+    {
+      "name": "priority",
+      "type": "checkbox_group",
+      "label": "우선 고려사항",
+      "options": [
+        {"value": "price", "label": "가격이 가장 중요"},
+        {"value": "performance", "label": "성능/스펙이 가장 중요"},
+        {"value": "reviews", "label": "실사용 후기가 좋은 제품"},
+        {"value": "brand", "label": "브랜드 신뢰도"},
+        {"value": "as", "label": "A/S 및 보증"}
+      ],
+      "default": ["price", "performance"],
+      "required": true
+    },
+    {
+      "name": "output_format",
+      "type": "radio",
+      "label": "결과물 형식",
+      "options": [
+        {"value": "table", "label": "화면 비교표만"},
+        {"value": "pdf", "label": "PDF 리포트 포함"},
+        {"value": "xlsx", "label": "엑셀 파일 포함"},
+        {"value": "all", "label": "전부"}
+      ],
+      "default": "table",
+      "required": true
+    }
+  ],
+
+  "outputs": {
+    "view_type": "comparison_dashboard",
+    "items": [
+      {
+        "name": "recommendation_summary",
+        "type": "markdown",
+        "label": "추천 요약"
+      },
+      {
+        "name": "comparison_table",
+        "type": "table",
+        "label": "제품 비교표",
+        "columns": ["순위", "제품명", "가격(최저가)", "핵심 스펙 1", "핵심 스펙 2", "핵심 스펙 3", "한줄평", "구매 링크"]
+      },
+      {
+        "name": "detailed_specs",
+        "type": "table",
+        "label": "상세 스펙 비교",
+        "columns": ["스펙 항목", "제품A", "제품B", "제품C"]
+      },
+      {
+        "name": "pros_cons",
+        "type": "table",
+        "label": "제품별 장단점",
+        "columns": ["제품명", "장점", "단점", "추천 대상"]
+      },
+      {
+        "name": "download_files",
+        "type": "file_bundle",
+        "label": "리포트 다운로드 (PDF/엑셀)"
+      }
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "info": {
+    "slug": "email-ghostwriter",
+    "name": "이메일 고스트라이터",
+    "version": "1.0.0",
+    "description": "받은 메일의 맥락을 분석하고, 원하는 의도에 맞는 비즈니스 답장을 대신 작성합니다.",
+    "price": 300,
+    "icon": "mail",
+    "category": "총무/경영지원",
+    "tags": ["이메일", "비즈니스 커뮤니케이션", "답장", "자동 작성"]
+  },
+
+  "run": {
+    "engine": "python-3.11",
+    "entry_point": "src.main:run",
+    "dependencies": "requirements.txt"
+  },
+
+  "resources": {
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5-20250514",
+      "parameters": {
+        "temperature": 0.6,
+        "max_tokens": 2048
+      }
+    },
+    "tools": [],
+    "auth": []
+  },
+
+  "inputs": [
+    {
+      "name": "original_email",
+      "type": "text_area",
+      "label": "받은 메일 내용",
+      "placeholder": "답장을 작성할 원본 메일 내용을 붙여넣으세요.",
+      "required": true
+    },
+    {
+      "name": "intent",
+      "type": "radio",
+      "label": "답장 의도",
+      "options": [
+        {"value": "accept", "label": "수락/동의"},
+        {"value": "decline", "label": "정중한 거절"},
+        {"value": "negotiate", "label": "조건 협상/역제안"},
+        {"value": "postpone", "label": "보류/일정 연기 요청"},
+        {"value": "inquiry", "label": "추가 정보 요청"},
+        {"value": "followup", "label": "후속 조치 안내"}
+      ],
+      "required": true
+    },
+    {
+      "name": "key_points",
+      "type": "text_area",
+      "label": "꼭 포함할 내용",
+      "placeholder": "예: 다음 주 화요일까지는 가능하다고 알려줘 / 예산이 초과라서 10% 할인 요청",
+      "required": false
+    },
+    {
+      "name": "tone",
+      "type": "radio",
+      "label": "어조",
+      "options": [
+        {"value": "formal", "label": "격식체 (사외 공문 수준)"},
+        {"value": "business_casual", "label": "비즈니스 캐주얼 (사내 메일 수준)"},
+        {"value": "friendly", "label": "친근함 (동료/협력사 담당자 수준)"}
+      ],
+      "default": "business_casual",
+      "required": true
+    },
+    {
+      "name": "language",
+      "type": "radio",
+      "label": "답장 언어",
+      "options": [
+        {"value": "ko", "label": "한국어"},
+        {"value": "en", "label": "영어"},
+        {"value": "auto", "label": "원본 메일과 동일한 언어"}
+      ],
+      "default": "auto",
+      "required": true
+    },
+    {
+      "name": "variant_count",
+      "type": "radio",
+      "label": "초안 개수",
+      "options": [
+        {"value": "1", "label": "1개"},
+        {"value": "3", "label": "3개 (비교 선택용)"}
+      ],
+      "default": "1",
+      "required": true
+    }
+  ],
+
+  "outputs": {
+    "view_type": "email_draft_list",
+    "items": [
+      {
+        "name": "drafts",
+        "type": "email_draft_array",
+        "label": "답장 초안",
+        "fields_per_draft": ["제목", "본문", "어조 설명"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "info": {
+    "slug": "paper-summarizer",
+    "name": "논문/보고서 요약 & 번역기",
+    "version": "1.0.0",
+    "description": "PDF 논문이나 보고서를 업로드하면 한국어 핵심 요약, 용어 해설, 구조화된 정리본을 생성합니다.",
+    "price": 600,
+    "icon": "book-open",
+    "category": "학술/연구",
+    "tags": ["논문", "요약", "번역", "학술", "보고서", "리서치"]
+  },
+
+  "run": {
+    "engine": "python-3.11",
+    "entry_point": "src.main:run",
+    "dependencies": "requirements.txt"
+  },
+
+  "resources": {
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5-20250514",
+      "parameters": {
+        "temperature": 0.2,
+        "max_tokens": 8192
+      }
+    },
+    "tools": [
+      {
+        "name": "pdf_extractor",
+        "description": "PDF에서 텍스트, 표, 그림 캡션 추출",
+        "library": "pdfplumber + PyMuPDF"
+      }
+    ],
+    "auth": []
+  },
+
+  "inputs": [
+    {
+      "name": "document",
+      "type": "file_upload",
+      "label": "논문 또는 보고서 파일",
+      "accept": [".pdf", ".docx", ".txt"],
+      "max_files": 5,
+      "max_size_mb": 30,
+      "required": true
+    },
+    {
+      "name": "summary_length",
+      "type": "radio",
+      "label": "요약 분량",
+      "options": [
+        {"value": "brief", "label": "한눈에 보기 (300자 내외)"},
+        {"value": "standard", "label": "표준 요약 (A4 1페이지)"},
+        {"value": "detailed", "label": "상세 요약 (A4 2~3페이지)"}
+      ],
+      "default": "standard",
+      "required": true
+    },
+    {
+      "name": "output_language",
+      "type": "radio",
+      "label": "결과 언어",
+      "options": [
+        {"value": "ko", "label": "한국어"},
+        {"value": "en", "label": "영어"},
+        {"value": "both", "label": "한국어 + 영어 병렬"}
+      ],
+      "default": "ko",
+      "required": true
+    },
+    {
+      "name": "audience_level",
+      "type": "radio",
+      "label": "독자 수준",
+      "options": [
+        {"value": "expert", "label": "전문가 (원문 용어 유지)"},
+        {"value": "graduate", "label": "대학원생 (핵심 용어 해설 포함)"},
+        {"value": "general", "label": "비전공자 (쉬운 용어로 풀어서 설명)"}
+      ],
+      "default": "graduate",
+      "required": true
+    },
+    {
+      "name": "focus_sections",
+      "type": "checkbox_group",
+      "label": "집중 요약할 섹션 (선택)",
+      "options": [
+        {"value": "methodology", "label": "연구 방법론"},
+        {"value": "results", "label": "실험 결과"},
+        {"value": "discussion", "label": "논의/고찰"},
+        {"value": "limitations", "label": "한계점 및 향후 연구"},
+        {"value": "all", "label": "전체 균등 요약"}
+      ],
+      "default": ["all"],
+      "required": false
+    }
+  ],
+
+  "outputs": {
+    "view_type": "structured_report",
+    "items": [
+      {
+        "name": "one_line_summary",
+        "type": "text",
+        "label": "한 줄 요약"
+      },
+      {
+        "name": "structured_summary",
+        "type": "markdown",
+        "label": "구조화된 요약본",
+        "sections": ["연구 배경 및 목적", "연구 방법", "주요 결과", "논의 및 시사점", "한계점"]
+      },
+      {
+        "name": "key_terms",
+        "type": "table",
+        "label": "핵심 용어 해설",
+        "columns": ["용어 (원문)", "한국어 번역", "해설"]
+      },
+      {
+        "name": "key_figures",
+        "type": "list",
+        "label": "핵심 수치/통계 정리"
+      },
+      {
+        "name": "download_file",
+        "type": "file",
+        "label": "요약본 다운로드 (마크다운 또는 PDF)"
+      }
+    ]
+  }
+}

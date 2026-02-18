@@ -1,0 +1,121 @@
+{
+  "info": {
+    "slug": "cover-letter-coach",
+    "name": "자기소개서 코치",
+    "version": "1.0.0",
+    "description": "채용 공고와 본인 경력을 입력하면, 직무에 맞춘 자기소개서 초안과 항목별 피드백을 생성합니다.",
+    "price": 700,
+    "icon": "pen-tool",
+    "category": "취업/커리어",
+    "tags": ["자기소개서", "취업", "채용", "이력서", "커리어"]
+  },
+
+  "run": {
+    "engine": "python-3.11",
+    "entry_point": "src.main:run",
+    "dependencies": "requirements.txt"
+  },
+
+  "resources": {
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5-20250514",
+      "parameters": {
+        "temperature": 0.5,
+        "max_tokens": 4096
+      }
+    },
+    "tools": [
+      {
+        "name": "jd_analyzer",
+        "description": "채용 공고에서 핵심 역량 키워드 및 평가 기준 추출",
+        "library": "자체 NLP 파이프라인"
+      }
+    ],
+    "auth": []
+  },
+
+  "inputs": [
+    {
+      "name": "job_posting",
+      "type": "text_area",
+      "label": "채용 공고 (JD)",
+      "placeholder": "채용 공고 전문을 붙여넣으세요.\n또는 채용 공고 URL을 입력해도 됩니다.",
+      "required": true
+    },
+    {
+      "name": "my_background",
+      "type": "text_area",
+      "label": "본인 경력/경험 요약",
+      "placeholder": "학력, 경력, 프로젝트, 자격증, 활동 등을 간단히 적어주세요.\n키워드 수준으로 적어도 됩니다.\n\n예:\n- 컴퓨터공학 전공, 2025년 졸업 예정\n- 네이버 인턴 (백엔드 개발, 6개월)\n- 졸업 프로젝트: 추천 시스템 개발\n- SQLD, 정보처리기사",
+      "required": true
+    },
+    {
+      "name": "existing_draft",
+      "type": "text_area",
+      "label": "기존 자기소개서 초안 (선택)",
+      "placeholder": "이미 작성한 초안이 있으면 붙여넣으세요. 첨삭 피드백을 제공합니다.",
+      "required": false
+    },
+    {
+      "name": "questions",
+      "type": "text_area",
+      "label": "자기소개서 문항 (선택)",
+      "placeholder": "특정 문항이 있으면 입력하세요. 없으면 일반적인 항목(지원 동기, 성장 과정, 입사 후 포부 등)으로 작성합니다.\n\n예:\n1. 지원 동기 (500자)\n2. 직무 관련 경험 (800자)\n3. 입사 후 목표 (500자)",
+      "required": false
+    },
+    {
+      "name": "tone_preference",
+      "type": "radio",
+      "label": "문체 선호",
+      "options": [
+        {"value": "professional", "label": "정중하고 논리적인 문체"},
+        {"value": "storytelling", "label": "에피소드 중심 스토리텔링"},
+        {"value": "concise", "label": "핵심만 간결하게"}
+      ],
+      "default": "storytelling",
+      "required": true
+    },
+    {
+      "name": "output_mode",
+      "type": "radio",
+      "label": "결과 유형",
+      "options": [
+        {"value": "new_draft", "label": "새로운 초안 작성"},
+        {"value": "review", "label": "기존 초안 첨삭 + 개선안"},
+        {"value": "both", "label": "둘 다"}
+      ],
+      "default": "new_draft",
+      "required": true
+    }
+  ],
+
+  "outputs": {
+    "view_type": "document_with_feedback",
+    "items": [
+      {
+        "name": "jd_analysis",
+        "type": "table",
+        "label": "채용 공고 핵심 분석",
+        "columns": ["핵심 역량 키워드", "중요도", "본인 경력 매칭 여부", "강조 전략"]
+      },
+      {
+        "name": "cover_letter_draft",
+        "type": "markdown",
+        "label": "자기소개서 초안"
+      },
+      {
+        "name": "section_feedback",
+        "type": "table",
+        "label": "항목별 피드백",
+        "columns": ["항목", "강점", "보완점", "수정 제안"]
+      },
+      {
+        "name": "keyword_check",
+        "type": "table",
+        "label": "키워드 반영 체크",
+        "columns": ["JD 핵심 키워드", "자소서 반영 여부", "반영 위치"]
+      }
+    ]
+  }
+}
