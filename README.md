@@ -18,4 +18,4 @@ haire/
     └── smart-sourcer/            스마트 소서
 ```
 
-각 폴더 안에 agent_configuration.json, haire.ymal 두 파일씩 들어있습니다.
+각 폴더 안에 MODEL_CARD.md, haire.ymal 두 파일씩 들어있습니다.
