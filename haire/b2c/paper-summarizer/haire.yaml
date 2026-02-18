@@ -1,0 +1,78 @@
+# ==============================================================================
+# hAIre Agent Configuration v1.1
+# ==============================================================================
+
+# 1. Identity
+info:
+  slug: "paper-summarizer"
+  name: "논문/보고서 요약 & 번역기"
+  version: "1.0.0"
+  description: "논문이나 보고서 내용을 입력하면 한국어 핵심 요약, 용어 해설, 구조화된 정리본을 생성합니다."
+  price: 600
+  icon: "📚"
+
+# 2. Runtime
+run:
+  engine: "python-3.11"
+  entry_point: "paper_summarizer.main:main"
+  dependencies: "requirements.txt"
+
+# 3. Resources
+resources:
+  llm:
+    provider: "anthropic"
+    model: "claude-sonnet-4-5-20250514"
+    parameters:
+      temperature: 0.2
+      max_tokens: 8192
+
+  tools: []
+  auth: []
+
+# 4. Inputs
+inputs:
+  - name: "document_text"
+    type: "text_area"
+    label: "논문 또는 보고서 내용"
+    placeholder: "요약할 논문이나 보고서의 내용을 붙여넣으세요."
+    required: true
+    examples:
+      - "Abstract: We propose a novel Graph Neural Network architecture that addresses the over-smoothing problem by incorporating multi-scale wavelet transforms..."
+
+  - name: "summary_length"
+    type: "select"
+    label: "요약 분량"
+    options:
+      - "한눈에 보기 (300자 내외)"
+      - "표준 요약 (A4 1페이지)"
+      - "상세 요약 (A4 2~3페이지)"
+
+  - name: "output_language"
+    type: "select"
+    label: "결과 언어"
+    options:
+      - "한국어"
+      - "영어"
+      - "한국어 + 영어 병렬"
+
+  - name: "audience_level"
+    type: "select"
+    label: "독자 수준"
+    options:
+      - "전문가 (원문 용어 유지)"
+      - "대학원생 (핵심 용어 해설 포함)"
+      - "비전공자 (쉬운 용어로 풀어서 설명)"
+
+  - name: "focus_section"
+    type: "select"
+    label: "집중 요약 섹션"
+    options:
+      - "전체 균등 요약"
+      - "연구 방법론 중심"
+      - "실험 결과 중심"
+      - "논의/고찰 중심"
+      - "한계점 및 향후 연구 중심"
+
+# 5. Outputs
+outputs:
+  view_type: "markdown"

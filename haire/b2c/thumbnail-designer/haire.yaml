@@ -1,0 +1,87 @@
+# ==============================================================================
+# hAIre Agent Configuration v1.1
+# ==============================================================================
+
+# 1. Identity
+info:
+  slug: "thumbnail-designer"
+  name: "썸네일 & 배너 디자이너"
+  version: "1.0.0"
+  description: "주제와 스타일을 입력하면 유튜브 썸네일, 블로그 배너, SNS 커버 이미지를 생성합니다."
+  price: 400
+  icon: "🎨"
+
+# 2. Runtime
+run:
+  engine: "python-3.11"
+  entry_point: "thumbnail_designer.main:main"
+  dependencies: "requirements.txt"
+
+# 3. Resources
+resources:
+  llm:
+    provider: "openai"
+    model: "gpt-4o"
+    parameters:
+      temperature: 0.3
+      max_tokens: 1024
+
+  tools: []
+
+  auth: []
+
+# 4. Inputs
+inputs:
+  - name: "content_topic"
+    type: "text_area"
+    label: "콘텐츠 주제/제목"
+    placeholder: "예: 자취생 냉장고 파먹기 레시피 / 일본 오사카 3일 여행기"
+    required: true
+    examples:
+      - "자취생 냉장고 파먹기 레시피"
+      - "일본 오사카 3일 여행기"
+      - "코딩 입문자를 위한 Python 강의"
+      - "2025년 꼭 읽어야 할 자기계발서 TOP 5"
+
+  - name: "image_type"
+    type: "select"
+    label: "이미지 용도"
+    options:
+      - "유튜브 썸네일 (1280x720)"
+      - "블로그 대표 이미지 (1200x630)"
+      - "인스타그램 피드 (1080x1080)"
+      - "인스타그램 스토리 (1080x1920)"
+
+  - name: "style"
+    type: "select"
+    label: "디자인 스타일"
+    options:
+      - "미니멀/깔끔"
+      - "굵은 텍스트/임팩트"
+      - "따뜻한/감성적"
+      - "레트로/빈티지"
+      - "테크/미래적"
+      - "팝/컬러풀"
+
+  - name: "text_overlay"
+    type: "text"
+    label: "이미지 위에 들어갈 텍스트 (선택)"
+    placeholder: "예: 5분 완성! / TOP 10 / EP.03"
+    required: false
+
+  - name: "color_preference"
+    type: "text"
+    label: "선호 색상 (선택)"
+    placeholder: "예: 파란색 계열, #FF5733, 민트색"
+    required: false
+
+  - name: "variant_count"
+    type: "select"
+    label: "시안 개수"
+    options:
+      - "3개"
+      - "5개"
+
+# 5. Outputs
+outputs:
+  view_type: "markdown"

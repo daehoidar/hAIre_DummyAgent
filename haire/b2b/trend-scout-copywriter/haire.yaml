@@ -1,0 +1,79 @@
+# ==============================================================================
+# hAIre Agent Configuration v1.1
+# ==============================================================================
+
+# 1. Identity
+info:
+  slug: "trend-scout-copywriter"
+  name: "트렌드 스카우트 & 카피라이터"
+  version: "1.0.0"
+  description: "키워드 또는 경쟁사 URL을 입력하면 최신 트렌드를 분석하고, 브랜드 톤에 맞는 마케팅 콘텐츠 대본을 생성합니다."
+  price: 900
+  icon: "📈"
+
+# 2. Runtime
+run:
+  engine: "python-3.11"
+  entry_point: "trend_scout_copywriter.main:main"
+  dependencies: "requirements.txt"
+
+# 3. Resources
+resources:
+  llm:
+    provider: "anthropic"
+    model: "claude-sonnet-4-5-20250514"
+    parameters:
+      temperature: 0.7
+      max_tokens: 4096
+
+  tools:
+    - name: "internet_search"
+      provider: "managed"
+
+  auth: []
+
+# 4. Inputs
+inputs:
+  - name: "keyword"
+    type: "text"
+    label: "분석할 키워드"
+    placeholder: "예: 비건 뷰티, 제로 웨이스트, MZ세대 건강식품"
+    required: true
+    examples:
+      - "비건 뷰티"
+      - "MZ세대 건강식품"
+      - "제로 웨이스트 생활용품"
+      - "홈트레이닝 소형 기구"
+
+  - name: "competitor_urls"
+    type: "text_area"
+    label: "경쟁사 SNS URL (선택, 줄바꿈으로 구분)"
+    placeholder: "https://www.instagram.com/competitor_brand\nhttps://blog.naver.com/competitor"
+    required: false
+
+  - name: "brand_tone"
+    type: "text_area"
+    label: "우리 브랜드 톤앤매너 설명"
+    placeholder: "예: 20대 여성 타겟, 밝고 친근한 말투, 이모지 적극 사용, ~해요체"
+    required: true
+
+  - name: "content_type"
+    type: "select"
+    label: "주요 콘텐츠 유형"
+    options:
+      - "카드뉴스 대본 (5~7장)"
+      - "숏폼(릴스/숏츠) 대본 (30~60초)"
+      - "블로그 포스팅 초안"
+      - "인스타그램 캡션 (5개)"
+      - "전체 (위 4종 모두)"
+
+  - name: "content_count"
+    type: "select"
+    label: "세트 수"
+    options:
+      - "3세트 (일주일치)"
+      - "5세트 (2주치)"
+
+# 5. Outputs
+outputs:
+  view_type: "markdown"

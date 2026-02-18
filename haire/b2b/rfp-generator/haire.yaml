@@ -1,0 +1,78 @@
+# ==============================================================================
+# hAIre Agent Configuration v1.1
+# ==============================================================================
+
+# 1. Identity
+info:
+  slug: "rfp-generator"
+  name: "RFP/제안서 초안 생성기"
+  version: "1.0.0"
+  description: "고객사 정보와 우리 서비스 소개를 입력하면, 맞춤형 제안서 초안과 예상 질문 리스트를 생성합니다."
+  price: 1200
+  icon: "📑"
+
+# 2. Runtime
+run:
+  engine: "python-3.11"
+  entry_point: "rfp_generator.main:main"
+  dependencies: "requirements.txt"
+
+# 3. Resources
+resources:
+  llm:
+    provider: "anthropic"
+    model: "claude-sonnet-4-5-20250514"
+    parameters:
+      temperature: 0.4
+      max_tokens: 8192
+
+  tools:
+    - name: "internet_search"
+      provider: "managed"
+
+  auth: []
+
+# 4. Inputs
+inputs:
+  - name: "client_info"
+    type: "text_area"
+    label: "고객사 정보"
+    placeholder: "고객사명, 업종, 최근 이슈, 홈페이지 URL 등을 입력하세요."
+    required: true
+    examples:
+      - "삼성SDS, IT서비스/컨설팅, 최근 클라우드 전환 가속화 중. https://www.samsungsds.com"
+      - "현대자동차 품질관리팀, 파운드리 라인 자동화 검사 도입 검토 중. 내년 상반기 적용 목표."
+
+  - name: "our_service"
+    type: "text_area"
+    label: "우리 서비스/솔루션 소개"
+    placeholder: "제안하려는 서비스의 핵심 기능, 강점, 차별점을 적어주세요."
+    required: true
+
+  - name: "rfp_text"
+    type: "text_area"
+    label: "RFP 원문 내용 (있는 경우)"
+    placeholder: "RFP 문서의 내용을 붙여넣으세요. 없으면 비워두셔도 됩니다."
+    required: false
+
+  - name: "proposal_type"
+    type: "select"
+    label: "제안서 유형"
+    options:
+      - "정식 제안서 (10~20페이지 분량)"
+      - "요약 제안서 (3~5페이지 분량)"
+      - "이메일용 제안 요약 (1페이지)"
+
+  - name: "emphasis"
+    type: "select"
+    label: "강조 포인트"
+    options:
+      - "비용 절감 효과 중심"
+      - "기술적 우위 중심"
+      - "유사 사례/레퍼런스 중심"
+      - "빠른 도입 일정 중심"
+      - "균형 있게 전체 포함"
+
+# 5. Outputs
+outputs:
+  view_type: "markdown"

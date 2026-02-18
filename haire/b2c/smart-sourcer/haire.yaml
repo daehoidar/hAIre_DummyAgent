@@ -1,0 +1,68 @@
+# ==============================================================================
+# hAIre Agent Configuration v1.1
+# ==============================================================================
+
+# 1. Identity
+info:
+  slug: "smart-sourcer"
+  name: "스마트 소서"
+  version: "1.0.0"
+  description: "AI가 직접 검색, 비교, 분석하여 최적의 제품을 추천하는 구매 비교 리포트를 생성합니다."
+  price: 500
+  icon: "🔍"
+
+# 2. Runtime
+run:
+  engine: "python-3.13"
+  entry_point: "smart_sourcer.main:main"
+  dependencies: "requirements.txt"
+
+# 3. Resources
+resources:
+  llm:
+    provider: "google"
+    model: "gemini-3-flash-preview"
+    parameters:
+      temperature: 0.7
+      max_tokens: 8192
+
+  tools:
+    - name: "internet_search"
+      provider: "managed"
+
+  auth: []
+
+# 4. Inputs
+inputs:
+  - name: "instruction"
+    type: "text_area"
+    label: "요청 사항"
+    placeholder: "27인치 4K 모니터, 예산 80만원 이하, USB-C 필수"
+    required: true
+    examples:
+      - "맥북 프로와 연결할 디자이너용 27인치 4K 모니터, 예산 80만원 이하, USB-C 충전 필수"
+      - "프로그래밍용 기계식 키보드, 예산 15만원 이하, 저소음 적축, 무선 블루투스"
+      - "1인 유튜버용 콘덴서 마이크, 예산 20만원 이하, USB 연결"
+      - "대학생용 가성비 노트북, 예산 100만원 이하, 가벼운 무게"
+
+  - name: "compare_count"
+    type: "select"
+    label: "비교 제품 수"
+    options:
+      - "3개 (빠른 비교)"
+      - "5개 (폭넓은 비교)"
+      - "자동 (조건에 맞는 최적 수)"
+
+  - name: "priority"
+    type: "select"
+    label: "우선 고려사항"
+    options:
+      - "가격 우선"
+      - "성능/스펙 우선"
+      - "실사용 후기 우선"
+      - "브랜드 신뢰도 우선"
+      - "균형 있게 종합 판단"
+
+# 5. Outputs
+outputs:
+  view_type: "comparison_report"

@@ -1,0 +1,89 @@
+# ==============================================================================
+# hAIre Agent Configuration v1.1
+# ==============================================================================
+
+# 1. Identity
+info:
+  slug: "travel-planner"
+  name: "여행 플래너"
+  version: "1.0.0"
+  description: "목적지, 일정, 예산, 취향을 입력하면 시간대별 일정표와 맛집/숙소 추천, 예산 배분표를 생성합니다."
+  price: 500
+  icon: "🗺️"
+
+# 2. Runtime
+run:
+  engine: "python-3.11"
+  entry_point: "travel_planner.main:main"
+  dependencies: "requirements.txt"
+
+# 3. Resources
+resources:
+  llm:
+    provider: "anthropic"
+    model: "claude-sonnet-4-5-20250514"
+    parameters:
+      temperature: 0.7
+      max_tokens: 8192
+
+  tools:
+    - name: "internet_search"
+      provider: "managed"
+
+  auth: []
+
+# 4. Inputs
+inputs:
+  - name: "destination"
+    type: "text"
+    label: "여행지"
+    placeholder: "예: 오사카, 제주도, 파리"
+    required: true
+    examples:
+      - "오사카"
+      - "제주도"
+      - "방콕"
+      - "파리"
+
+  - name: "duration"
+    type: "text"
+    label: "여행 기간"
+    placeholder: "예: 2박3일, 3박4일, 당일치기"
+    required: true
+
+  - name: "budget"
+    type: "text"
+    label: "예산 (1인 기준)"
+    placeholder: "예: 50만원, 100만원, 제한 없음"
+    required: true
+
+  - name: "travel_style"
+    type: "select"
+    label: "여행 스타일"
+    options:
+      - "맛집 탐방 중심"
+      - "문화/역사 탐방 중심"
+      - "자연/힐링 중심"
+      - "쇼핑 중심"
+      - "액티비티/체험 중심"
+      - "골고루 (맛집+관광+쇼핑)"
+
+  - name: "companions"
+    type: "select"
+    label: "동행 유형"
+    options:
+      - "혼자"
+      - "커플"
+      - "친구"
+      - "가족 (아이 동반)"
+      - "가족 (부모님 동반)"
+
+  - name: "constraints"
+    type: "text_area"
+    label: "특별 요청 사항 (선택)"
+    placeholder: "예: 휠체어 접근 가능한 곳만, 해산물 알레르기 있음, 숙소는 역 근처로"
+    required: false
+
+# 5. Outputs
+outputs:
+  view_type: "markdown"

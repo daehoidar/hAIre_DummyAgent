@@ -1,0 +1,80 @@
+# ==============================================================================
+# hAIre Agent Configuration v1.1
+# ==============================================================================
+
+# 1. Identity
+info:
+  slug: "cover-letter-coach"
+  name: "자기소개서 코치"
+  version: "1.0.0"
+  description: "채용 공고와 본인 경력을 입력하면, 직무에 맞춘 자기소개서 초안과 항목별 피드백을 생성합니다."
+  price: 700
+  icon: "✍️"
+
+# 2. Runtime
+run:
+  engine: "python-3.11"
+  entry_point: "cover_letter_coach.main:main"
+  dependencies: "requirements.txt"
+
+# 3. Resources
+resources:
+  llm:
+    provider: "anthropic"
+    model: "claude-sonnet-4-5-20250514"
+    parameters:
+      temperature: 0.5
+      max_tokens: 4096
+
+  tools: []
+  auth: []
+
+# 4. Inputs
+inputs:
+  - name: "job_posting"
+    type: "text_area"
+    label: "채용 공고 (JD)"
+    placeholder: "채용 공고 전문을 붙여넣으세요."
+    required: true
+    examples:
+      - "[프론트엔드 개발자 채용]\n담당 업무: React 기반 웹 서비스 개발, UI/UX 개선\n자격 요건: React 2년 이상, TypeScript 경험\n우대 사항: Next.js 경험, 디자인 시스템 구축 경험"
+
+  - name: "my_background"
+    type: "text_area"
+    label: "본인 경력/경험 요약"
+    placeholder: "학력, 경력, 프로젝트, 자격증, 활동 등을 간단히 적어주세요.\n키워드 수준으로 적어도 됩니다."
+    required: true
+    examples:
+      - "컴퓨터공학 전공, 2025년 졸업 예정\n네이버 인턴 (백엔드 개발, 6개월)\n졸업 프로젝트: 추천 시스템 개발\nSQLD, 정보처리기사"
+
+  - name: "existing_draft"
+    type: "text_area"
+    label: "기존 자기소개서 초안 (선택)"
+    placeholder: "이미 작성한 초안이 있으면 붙여넣으세요. 첨삭 피드백을 제공합니다."
+    required: false
+
+  - name: "questions"
+    type: "text_area"
+    label: "자기소개서 문항 (선택)"
+    placeholder: "특정 문항이 있으면 입력하세요.\n예: 1. 지원 동기 (500자) 2. 직무 관련 경험 (800자)"
+    required: false
+
+  - name: "tone_preference"
+    type: "select"
+    label: "문체 선호"
+    options:
+      - "정중하고 논리적인 문체"
+      - "에피소드 중심 스토리텔링"
+      - "핵심만 간결하게"
+
+  - name: "output_mode"
+    type: "select"
+    label: "결과 유형"
+    options:
+      - "새로운 초안 작성"
+      - "기존 초안 첨삭 + 개선안"
+      - "둘 다"
+
+# 5. Outputs
+outputs:
+  view_type: "markdown"
